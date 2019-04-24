@@ -1,38 +1,43 @@
 /*
- * AA Tree
- * Recursion Version.
- * 2019-04-24
-    MIT License
+ |    Summary: AA Tree
+ |       Date: 2019-04-24
+ | Programmer: JuYan
+ |    Version: 1.1
+ +--------------------------------------
+  MIT License
 
-    Copyright (c) 2019 JuYan
+  Copyright (c) 2019 JuYan
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
 */
+#include <stdio.h>
+#include <stdlib.h>
 #include "AATree.h"
-AATreeNode *mallocNode()
+
+static AATreeNode *mallocNode()
 {
     AATreeNode *p;
     p = (AATreeNode*)malloc(sizeof(AATreeNode));
     return p;
 }
 
-AATree Skew(AATree t)
+static AATree Skew(AATree t)
 {
     AATree l;
     if (t == NULL)
@@ -49,7 +54,7 @@ AATree Skew(AATree t)
     return t;
 }
 
-AATree Split(AATree t)
+static AATree Split(AATree t)
 {
     AATree r;
     if (t == NULL)
@@ -67,7 +72,7 @@ AATree Split(AATree t)
     return t;
 }
 
-AATreeNode *Predecessor(AATreeNode *curNode)
+static AATreeNode *Predecessor(AATreeNode *curNode)
 {
     curNode = curNode->left;
     while (curNode->right != NULL)
@@ -77,7 +82,7 @@ AATreeNode *Predecessor(AATreeNode *curNode)
     return curNode;
 }
 
-AATreeNode *Successor(AATreeNode *curNode)
+static AATreeNode *Successor(AATreeNode *curNode)
 {
     curNode = curNode->right;
     while (curNode->left != NULL)
@@ -87,7 +92,7 @@ AATreeNode *Successor(AATreeNode *curNode)
     return curNode;
 }
 
-AATree Decrease_level(AATree t)
+static AATree Decrease_level(AATree t)
 {
     int wdo;
     if (t->left != NULL && t->right != NULL)
@@ -105,7 +110,7 @@ AATree Decrease_level(AATree t)
     return t;
 }
 
-AATree _InsertData(AATree t, int key, const treeData *data)
+static AATree _InsertData(AATree t, int key, const treeData *data)
 {
     if (t == NULL)
     {
@@ -126,7 +131,7 @@ AATree _InsertData(AATree t, int key, const treeData *data)
     return t;
 }
 
-AATree _DeleteData(AATree t, int key)
+static AATree _DeleteData(AATree t, int key)
 {
     AATree m;
     if (t == NULL)
@@ -174,17 +179,17 @@ AATree _DeleteData(AATree t, int key)
     return t;
 }
 
-inline void insertData(AATree *t, int key, const treeData *data)
+extern void aat_insertData(AATree *t, int key, const treeData *data)
 {
-    *t = _InsertData(*t, key, data);
+    *t = _InsertData(*t, key, data);                        // To make code simple, using a tiny function to call _InsertData.
 }
 
-inline void deleteData(AATree *t, int key)
+extern void aat_deleteData(AATree *t, int key)
 {
     *t = _DeleteData(*t, key);
 }
 
-void searchData(AATree bst, int key, treeData **data)
+extern void aat_searchData(AATree bst, int key, treeData **data)
 {
     AATree  i;
     i = bst;
@@ -203,109 +208,24 @@ void searchData(AATree bst, int key, treeData **data)
     *data = NULL;                                           // Not found.
 }
 
-void deleteDataTree(AATree *t)
+extern void aat_deleteTree(AATree *t)
 {
     if (*t == NULL)
         return;
-    deleteDataTree(&(*t)->left);
-    deleteDataTree(&(*t)->right);
+    aat_deleteTree(&(*t)->left);
+    aat_deleteTree(&(*t)->right);
     free(*t);
     *t = NULL;
 }
 
-void printTree(FILE *f, AATree tree, int level)
+extern void aat_printTree(FILE *f, AATree tree, int level)
 {
     int i;
     if (!tree)
         return;
-    printTree(f, tree->right, level + 1);
+    aat_printTree(f, tree->right, level + 1);
     for (i = 0; i < level; i++)
         fprintf(f, "    ");
     fprintf(f, "%d\r\n", tree->key);
-    printTree(f, tree->left, level + 1);
+    aat_printTree(f, tree->left, level + 1);
 }
-
-void test_delete(AATree *aat, int key)
-{
-    CStopWatch t;
-    t.start();
-    deleteData(aat, key);
-    t.stop();
-    printf("Delete: %d, Time:%lfus\n", key, t.getElapsedTime());
-}
-
-void test_search(AATree aat, int key)
-{
-    treeData   *d;
-    CStopWatch  t;
-    t.start();
-    searchData(aat, key, &d);
-    t.stop();
-    printf("Find: %d, Time:%lfus, Result: ", key, t.getElapsedTime());
-    if (d == NULL)
-        printf("Not found.\n");
-    else
-        printf("%d\n", *d);
-}
-
-int myrand(int max)
-{
-    int v;
-    v = rand() | (rand() << 16);
-    v %= max;
-    return v;
-}
-
-int main()
-{
-    AATree      aat = NULL;
-    int         k, i, n, dat;
-    printf("Insert: ");
-    std::cin >> n;
-    for (i = 0; i < n; i++)
-    {
-        k = i;
-        dat = k ^ myrand(n);
-        insertData(&aat, k, &dat);
-    }
-    printTree(stdout, aat, 0);
-    deleteDataTree(&aat);
-    system("pause");
-    return 0;
-}
-/*
-Test 2
-int main()
-{
-    AATree      aat = NULL;
-    CStopWatch  t;
-    int         k, i, n, dat;
-    printf("Insert(10^9): ");
-    std::cin >> n;
-    n *= 100000000;
-    t.start();
-    for (i = 0; i < n; i++)
-    {
-        k = i;
-        dat = k ^ myrand(n);
-        insertData(&aat, k, &dat);
-    }
-    t.stop();
-    printf("Insert: %d, Time: %lfs\n", n, t.getElapsedTime() / 1000000);
-
-    test_delete(&aat, myrand(n));
-    test_delete(&aat, myrand(n));
-    test_delete(&aat, myrand(n));
-    test_delete(&aat, myrand(n));
-
-    test_search(aat, myrand(n));
-    test_search(aat, myrand(n));
-    test_search(aat, myrand(n));
-    test_search(aat, myrand(n));
-
-    system("pause");
-    deleteDataTree(&aat);
-    system("pause");
-    return 0;
-}
-*/
